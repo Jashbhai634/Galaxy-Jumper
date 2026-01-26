@@ -30,3 +30,4 @@
 ​Audio: Procedural sound synthesis using the Web Audio API (no external .mp3 files needed!).
 ​Procedural Generation: An anti-pattern spawn engine ensures that every run is unique and fair.
 ​Responsiveness: Fully responsive design that adapts to mobile and desktop screens.
+Click here to play ! [https://jashbhai634.github.io/Galaxy-Jumper/]
