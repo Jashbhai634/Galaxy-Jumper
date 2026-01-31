@@ -2,105 +2,258 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Galaxy Jumper</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { overflow: hidden; background: linear-gradient(to bottom, #0a0a2a, #1a1a40); color: white; height: 100vh; display: flex; justify-content: center; align-items: center; }
-        #gameContainer { position: relative; width: 100%; max-width: 800px; height: 600px; margin: auto; border-radius: 20px; overflow: hidden; box-shadow: 0 0 50px rgba(0, 200, 255, 0.5); }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            user-select: none; 
+            -webkit-tap-highlight-color: transparent; /* Prevents blue box on mobile tap */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        }
+        
+        body { 
+            overflow: hidden; 
+            background: #000; 
+            background: linear-gradient(to bottom, #0a0a2a, #1a1a40); 
+            color: white; 
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            touch-action: none; /* Prevents browser pull-to-refresh */
+        }
+
+        #gameContainer { 
+            position: relative; 
+            width: 100%; 
+            max-width: 800px; 
+            height: 100vh; /* Better fit for mobile */
+            max-height: 600px;
+            margin: auto; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            box-shadow: 0 0 50px rgba(0, 200, 255, 0.5); 
+            background: #000;
+        }
+
+        canvas { 
+            display: block; 
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #000428, #004e92); 
+            transition: filter 0.3s; 
+        }
+
         .distorted { filter: blur(8px) hue-rotate(90deg); }
-        canvas { display: block; background: radial-gradient(circle at center, #000428, #004e92); transition: filter 0.3s; }
-        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0, 10, 30, 0.95); z-index: 100; padding: 20px; text-align: center; }
+
+        .screen { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            background: rgba(0, 10, 30, 0.95); 
+            z-index: 100; 
+            padding: 20px; 
+            text-align: center; 
+        }
+
         #rulesScreen { text-align: left; align-items: center; overflow-y: auto; }
-        .rules-content { max-width: 600px; background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 15px; margin-bottom: 20px; font-size: 0.85rem; line-height: 1.4; }
+        
+        .rules-content { 
+            max-width: 600px; 
+            background: rgba(255, 255, 255, 0.1); 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin-bottom: 20px; 
+            font-size: 0.85rem; 
+            line-height: 1.4; 
+        }
+
         .hidden { display: none !important; }
-        h1 { font-size: 4rem; margin-bottom: 20px; background: linear-gradient(to right, #00dbde, #fc00ff); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 0 0 15px rgba(255, 255, 255, 0.5); }
-        h2 { font-size: 2.5rem; margin-bottom: 10px; color: #00ffcc; }
-        .btn { background: linear-gradient(to right, #00c6ff, #0072ff); color: white; border: none; padding: 12px 35px; font-size: 1.2rem; border-radius: 50px; cursor: pointer; margin: 5px; transition: all 0.3s; box-shadow: 0 5px 20px rgba(0, 114, 255, 0.5); }
-        .btn:hover { transform: scale(1.05); }
-        .btn-secondary { background: linear-gradient(to right, #666, #333); }
-        #ui { position: absolute; top: 0; left: 0; width: 100%; padding: 20px; display: flex; justify-content: space-between; z-index: 50; pointer-events: none; gap: 10px; }
-        .ui-box { background: rgba(0, 20, 40, 0.7); padding: 10px 15px; border-radius: 15px; border: 2px solid #00aaff; min-width: 90px; text-align: center; backdrop-filter: blur(5px); }
-        #gravityWarning, #errorWarning { position: absolute; top: 85px; left: 50%; transform: translateX(-50%); padding: 5px 15px; border-radius: 20px; font-weight: bold; display: none; z-index: 6; animation: pulse 1s infinite; }
-        #gravityWarning { background: rgba(255, 100, 0, 0.6); color: white; }
-        #errorWarning { background: rgba(138, 43, 226, 0.8); color: white; top: 120px; }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-        .ui-title { font-size: 0.8rem; color: #88ddff; }
-        .ui-value { font-size: 1.5rem; font-weight: bold; color: #00ffcc; }
-        #characterSelect { display: flex; gap: 15px; margin: 15px 0; flex-wrap: wrap; justify-content: center; }
-        .character-container { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .character { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(45deg, #333, #666); display: flex; justify-content: center; align-items: center; font-size: 1.8rem; cursor: pointer; border: 3px solid transparent; transition: all 0.3s; }
-        .character.selected { border-color: #00ffcc; box-shadow: 0 0 20px #00ffcc; }
-        .ability-text { font-size: 0.6rem; color: #00ffcc; max-width: 70px; }
-        #controls { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: space-around; z-index: 50; pointer-events: none; }
-        .control-btn { width: 70px; height: 70px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 3px solid rgba(255, 255, 255, 0.5); display: flex; justify-content: center; align-items: center; font-size: 1.8rem; color: white; pointer-events: auto; cursor: pointer; backdrop-filter: blur(5px); }
-        .bar-container { position: absolute; left: 50%; transform: translateX(-50%); width: 200px; height: 10px; background: rgba(0, 0, 0, 0.5); border-radius: 5px; display: none; z-index: 50; }
-        #magnetBarContainer { bottom: 120px; border: 1px solid #ff00ff; }
-        #shieldBarContainer { bottom: 135px; border: 1px solid #00ffff; }
-        #blastBarContainer { bottom: 150px; border: 1px solid #ffffff; }
-        #droneBarContainer { bottom: 165px; border: 1px solid #00ff00; }
-        .bar-fill { width: 100%; height: 100%; border-radius: 4px; transition: width 0.1s linear; }
-        #magnetBar { background: linear-gradient(to right, #ff00ff, #00ffff); }
-        #shieldBar { background: linear-gradient(to right, #00ffff, #0088ff); }
-        #blastBar { background: linear-gradient(to right, #ffffff, #ffaa00); }
-        #droneBar { background: linear-gradient(to right, #00ff00, #aaff00); }
-        #blastFlash { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; opacity: 0; pointer-events: none; z-index: 200; transition: opacity 0.5s ease-out; }
+
+        h1 { 
+            font-size: clamp(2rem, 8vw, 4rem); /* Responsive text */
+            margin-bottom: 20px; 
+            background: linear-gradient(to right, #00dbde, #fc00ff); 
+            -webkit-background-clip: text; 
+            background-clip: text; 
+            color: transparent; 
+            font-weight: 800;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.3); 
+        }
+
+        .btn { 
+            background: linear-gradient(to right, #00c6ff, #0072ff); 
+            color: white; 
+            border: none; 
+            padding: 12px 35px; 
+            font-size: 1.1rem; 
+            font-weight: 600;
+            border-radius: 50px; 
+            cursor: pointer; 
+            margin: 8px; 
+            transition: all 0.2s ease; 
+            box-shadow: 0 5px 20px rgba(0, 114, 255, 0.4); 
+        }
+
+        .btn:active { transform: scale(0.95); }
+        .btn-secondary { background: linear-gradient(to right, #444, #222); }
+
+        /* UI Styling */
+        #ui { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            padding: 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            z-index: 50; 
+            pointer-events: none; 
+            gap: 10px; 
+        }
+
+        .ui-box { 
+            background: rgba(0, 20, 40, 0.7); 
+            padding: 8px 12px; 
+            border-radius: 12px; 
+            border: 1px solid rgba(0, 170, 255, 0.5); 
+            min-width: 70px; 
+            text-align: center; 
+            backdrop-filter: blur(5px); 
+        }
+
+        .ui-title { font-size: 0.7rem; color: #88ddff; text-transform: uppercase; letter-spacing: 1px; }
+        .ui-value { font-size: 1.2rem; font-weight: bold; color: #00ffcc; }
+
+        /* Progress Bars */
+        .bar-container { 
+            position: absolute; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 180px; 
+            height: 8px; 
+            background: rgba(0, 0, 0, 0.5); 
+            border-radius: 10px; 
+            display: none; 
+            z-index: 50; 
+        }
+        .bar-fill { width: 100%; height: 100%; border-radius: 10px; transition: width 0.1s linear; }
+
+        #droneBarContainer { bottom: 150px; }
+        #blastBarContainer { bottom: 135px; }
+        #shieldBarContainer { bottom: 120px; }
+        #magnetBarContainer { bottom: 105px; }
+
+        /* Character Selection */
+        #characterSelect { display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap; justify-content: center; }
+        .character { 
+            width: 55px; height: 55px; border-radius: 50%; 
+            background: rgba(255,255,255,0.1); display: flex; 
+            justify-content: center; align-items: center; 
+            font-size: 1.5rem; cursor: pointer; border: 2px solid transparent; 
+            transition: all 0.3s; 
+        }
+        .character.selected { border-color: #00ffcc; background: rgba(0, 255, 204, 0.2); box-shadow: 0 0 15px #00ffcc; }
+
+        /* Controls */
+        #controls { 
+            position: absolute; 
+            bottom: 20px; 
+            width: 100%; 
+            display: flex; 
+            justify-content: space-around; 
+            align-items: center;
+            z-index: 50; 
+            pointer-events: none; 
+        }
+        .control-btn { 
+            width: 75px; 
+            height: 75px; 
+            border-radius: 50%; 
+            background: rgba(255, 255, 255, 0.15); 
+            border: 2px solid rgba(255, 255, 255, 0.3); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 2rem; 
+            color: white; 
+            pointer-events: auto; 
+            backdrop-filter: blur(8px); 
+        }
+        .control-btn:active { background: rgba(0, 255, 204, 0.4); }
+
+        #blastFlash { 
+            position: absolute; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: white; opacity: 0; pointer-events: none; 
+            z-index: 200; 
+        }
     </style>
 </head>
 <body>
     <div id="gameContainer">
         <div id="blastFlash"></div>
         <canvas id="gameCanvas"></canvas>
-        <div id="gravityWarning">⚠️ GRAVITY DISTORTION</div>
-        <div id="errorWarning">⚠️ SYSTEM ERROR: INVERTED</div>
+        
+        <div id="errorWarning" class="screen hidden" style="background: rgba(255,0,0,0.2); pointer-events:none; z-index: 60;">
+            <h2 style="color: #ff0000; text-shadow: 0 0 10px red;">⚠️ SYSTEM ERROR: INVERTED</h2>
+        </div>
         
         <div id="ui">
-            <div class="ui-box"><div class="ui-title">SCORE</div><div id="score" class="ui-value">0</div></div>
-            <div class="ui-box"><div class="ui-title">BEST</div><div id="highScore" class="ui-value">0</div></div>
-            <div class="ui-box"><div class="ui-title">COINS</div><div id="coins" class="ui-value">0</div></div>
-            <div class="ui-box"><div class="ui-title">SPEED</div><div id="speed" class="ui-value">1.4x</div></div>
+            <div class="ui-box"><div class="ui-title">Score</div><div id="score" class="ui-value">0</div></div>
+            <div class="ui-box"><div class="ui-title">Best</div><div id="highScore" class="ui-value">0</div></div>
+            <div class="ui-box"><div class="ui-title">Coins</div><div id="coins" class="ui-value">0</div></div>
+            <div class="ui-box"><div class="ui-title">Speed</div><div id="speed" class="ui-value">1.4x</div></div>
         </div>
 
-        <div id="droneBarContainer" class="bar-container"><div id="droneBar" class="bar-fill"></div></div>
-        <div id="blastBarContainer" class="bar-container"><div id="blastBar" class="bar-fill"></div></div>
-        <div id="shieldBarContainer" class="bar-container"><div id="shieldBar" class="bar-fill"></div></div>
-        <div id="magnetBarContainer" class="bar-container"><div id="magnetBar" class="bar-fill"></div></div>
+        <div id="droneBarContainer" class="bar-container"><div id="droneBar" class="bar-fill" style="background:#00ff00;"></div></div>
+        <div id="blastBarContainer" class="bar-container"><div id="blastBar" class="bar-fill" style="background:#ffffff;"></div></div>
+        <div id="shieldBarContainer" class="bar-container"><div id="shieldBar" class="bar-fill" style="background:#00ffff;"></div></div>
+        <div id="magnetBarContainer" class="bar-container"><div id="magnetBar" class="bar-fill" style="background:#ff00ff;"></div></div>
 
         <div id="startScreen" class="screen">
             <h1>GALAXY JUMPER</h1>
             <div id="characterSelect">
-                <div class="character-container"><div class="character selected" data-char="comet">💫</div><span class="ability-text">Double Jump</span></div>
-                <div class="character-container"><div class="character" data-char="superstar">🌟</div><span class="ability-text">Magnet King</span></div>
-                <div class="character-container"><div class="character" data-char="smallstar">⭐</div><span class="ability-text">Coin Collector</span></div>
-                <div class="character-container"><div class="character" data-char="pulse">⚡</div><span class="ability-text">High Speed</span></div>
-                <div class="character-container"><div class="character" data-char="flare">☀️</div><span class="ability-text">Slow Gravity</span></div>
+                <div class="flex flex-col items-center"><div class="character selected" data-char="comet">💫</div><span class="text-xs text-blue-300">Jump+</span></div>
+                <div class="flex flex-col items-center"><div class="character" data-char="superstar">🌟</div><span class="text-xs text-blue-300">Magnet</span></div>
+                <div class="flex flex-col items-center"><div class="character" data-char="smallstar">⭐</div><span class="text-xs text-blue-300">Wealth</span></div>
+                <div class="flex flex-col items-center"><div class="character" data-char="pulse">⚡</div><span class="text-xs text-blue-300">Speed</span></div>
             </div>
-            <button id="startBtn" class="btn">LAUNCH MISSION</button>
-            <button id="rulesBtn" class="btn btn-secondary">RULES</button>
+            <div class="mt-4">
+                <button id="startBtn" class="btn">LAUNCH MISSION</button>
+                <button id="rulesBtn" class="btn btn-secondary">RULES</button>
+            </div>
         </div>
 
         <div id="rulesScreen" class="screen hidden">
-            <h2 style="color: #ff00ff;">MISSION MANUAL</h2>
+            <h2 style="color: #00ffcc;">MISSION MANUAL</h2>
             <div class="rules-content">
-                <p><strong>🛑 HAZARDS:</strong> Avoid Red/Pink/Orange objects and Sentinels.</p>
-                <p><strong>🚀 FLIGHT:</strong> Tap UP to jump. Continuous tapping pushes obstacles down!</p>
-                <p><strong>🛸 DRONE:</strong> Equips auto-firing drones (6-Bullet Triple Spread).</p>
-                <p><strong>🧲 MAGNET:</strong> Pulls nearby yellow coins toward you.</p>
-                <p><strong>🛡️ SHIELD:</strong> Absorbs one collision with an obstacle.</p>
-                <p><strong>💥 SUPERNOVA:</strong> Clears all hazards for 5s (Spawns every 500pts).</p>
-                <p><strong>🌀 NEBULA:</strong> Inverts controls and blurs view temporarily.</p>
-                <p><strong>💰 COINS:</strong> Collect yellow spheres to increase your total.</p>
+                <p><strong>🛑 HAZARDS:</strong> Avoid red objects and Sentinels.</p>
+                <p><strong>🚀 JUMP:</strong> Tap ↑ to leap. Avoid falling off platforms!</p>
+                <p><strong>🛡️ ITEMS:</strong> Collect Shields, Magnets, and Drones to survive.</p>
+                <p><strong>🌀 NEBULA:</strong> Beware the purple mist! It inverts your flight path.</p>
             </div>
-            <button id="backToMenuBtn" class="btn">BACK TO MENU</button>
+            <button id="backToMenuBtn" class="btn">BACK</button>
         </div>
 
         <div id="gameOverScreen" class="screen hidden">
-            <h2>MISSION FAILED</h2>
-            <div class="score-display" id="finalScore" style="font-size: 2.5rem; color: #00ffcc; margin: 10px;">0</div>
-            <div class="best-display" style="margin-bottom: 25px;">HIGH SCORE: <span id="finalBest">0</span></div>
-            <div style="display: flex; gap: 15px;">
+            <h2 style="color: #ff4444;">MISSION FAILED</h2>
+            <div class="text-5xl font-bold my-4" id="finalScore" style="color: #00ffcc;">0</div>
+            <div class="text-xl opacity-80 mb-6">BEST: <span id="finalBest">0</span></div>
+            <div class="flex gap-4">
                 <button id="restartBtn" class="btn">RETRY</button>
                 <button id="menuBtn" class="btn btn-secondary">MENU</button>
             </div>
