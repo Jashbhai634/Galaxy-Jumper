@@ -1,7 +1,15 @@
-<p align="center">
-  <img src="images/logo.png" width="250">
-</p>
- Galaxy Jumper
+<div class="logo-container">
+  <img src="logo.png" alt="Game Logo" width="300">
+</div>
+
+<style>
+  .logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+</style>
+Galaxy Jumper
 ​Galaxy Jumper is a high-octane, endless space survival game built with HTML5 Canvas and JavaScript. Navigate through a dangerous asteroid field, evade the Nebula Sentinels, and survive cosmic distortions to achieve the highest score.
 ​🎮 How to Play
 ​Controls
@@ -33,4 +41,4 @@
 ​Audio: Procedural sound synthesis using the Web Audio API (no external .mp3 files needed!).
 ​Procedural Generation: An anti-pattern spawn engine ensures that every run is unique and fair.
 ​Responsiveness: Fully responsive design that adapts to mobile and desktop screens.
-Click here to play ! [https://jashbhai634.github.io/Galaxy-Jumper/]
+Click here to play ! [https://jashbhai634.github
