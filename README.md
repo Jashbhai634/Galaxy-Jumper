@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="logo.png" width="250">
+</p>
  Galaxy Jumper
 ​Galaxy Jumper is a high-octane, endless space survival game built with HTML5 Canvas and JavaScript. Navigate through a dangerous asteroid field, evade the Nebula Sentinels, and survive cosmic distortions to achieve the highest score.
 ​🎮 How to Play
