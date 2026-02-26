@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galaxy Jumper</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet"></script>
-    
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { overflow: hidden; background: linear-gradient(to bottom, #0a0a2a, #1a1a40); color: white; height: 100vh; display: flex; justify-content: center; align-items: center; }
@@ -61,7 +60,7 @@
             <div class="ui-box"><div class="ui-title">SCORE</div><div id="score" class="ui-value">0</div></div>
             <div class="ui-box"><div class="ui-title">BEST</div><div id="highScore" class="ui-value">0</div></div>
             <div class="ui-box"><div class="ui-title">COINS</div><div id="coins" class="ui-value">0</div></div>
-            <div class="ui-box"><div class="ui-title">SPEED</div><div id="speed" class="ui-value">1.4x</div></div>
+            <div class="ui-box"><div class="ui-title">SPEED</div><div id="speed" class="ui-value">1.6x</div></div>
         </div>
 
         <div id="droneBarContainer" class="bar-container"><div id="droneBar" class="bar-fill"></div></div>
@@ -90,7 +89,7 @@
                 <p><strong>🛸 DRONE:</strong> Equips auto-firing drones (6-Bullet Triple Spread).</p>
                 <p><strong>🧲 MAGNET:</strong> Pulls nearby yellow coins toward you.</p>
                 <p><strong>🛡️ SHIELD:</strong> Absorbs one collision with an obstacle.</p>
-                <p><strong>💥 SUPERNOVA:</strong> Clears all hazards for 5s (Spawns every 500pts).</p>
+                <p><strong>💥 SUPERNOVA:</strong> Clears all hazards for 3.5s (Spawns every 750pts).</p>
                 <p><strong>🌀 NEBULA:</strong> Inverts controls and blurs view temporarily.</p>
                 <p><strong>💰 COINS:</strong> Collect yellow spheres to increase your total.</p>
             </div>
@@ -117,3 +116,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
