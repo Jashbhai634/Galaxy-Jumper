@@ -1,6 +1,6 @@
 ![Game Logo](logo.png)
 # Galaxy Jumper 
-Jump into Infinity
+'Jump into Infinity'
 
 ​Galaxy Jumper is a high-octane, endless space survival game built with HTML5 Canvas and JavaScript. Navigate through a dangerous asteroid field, evade the Nebula Sentinels, and survive cosmic distortions to achieve the highest score.Set in the depths of an ever-expanding cosmos, the game challenges you to navigate through relentless waves of asteroids, satellites, and unpredictable space debris. With every second you survive, the speed intensifies and the stakes rise, transforming each run into a battle against both gravity and time. There are no levels to complete and no finish line to cross—only your skill, precision, and focus determine how far you go. Galaxy Jumper delivers a clean, immersive experience built purely around reaction speed and competitive high-score mastery. In this universe, hesitation means collision, and only the sharpest players dominate the stars. 🚀🌌
 
